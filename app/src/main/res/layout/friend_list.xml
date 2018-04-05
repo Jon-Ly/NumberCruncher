@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cs344.numbercruncher.FriendListActivity">
+    tools:context="cs344.numbercruncher.FriendListFragment"
+    android:id="@+id/FriendFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,126 +20,5 @@
             android:layout_height="wrap_content"
             android:text="Friend List"
             android:textSize="30sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="Gueorgui Gueorguiev" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="Thomas Naps" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="David Furcy" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="George Thomas" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="Erik Krohn" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="30dp"
-                android:layout_height="36dp"
-                android:layout_weight="1"
-                android:text="Scott Summers" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Challenge" />
-
-        </LinearLayout>
-
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

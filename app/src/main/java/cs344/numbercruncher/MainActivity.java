@@ -1,13 +1,8 @@
 package cs344.numbercruncher;
 
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -32,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         challengeButton.setOnClickListener((new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent friendsIntent = new Intent(MainActivity.this, FriendListActivity.class);
+                Intent friendsIntent = new Intent(MainActivity.this, FriendListFragment.class);
                 startActivity(friendsIntent);
             }
         }));

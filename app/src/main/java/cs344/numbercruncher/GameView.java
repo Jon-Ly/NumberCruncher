@@ -12,8 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -54,7 +52,7 @@ public class GameView extends View{
         displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        for(int i = 0; i < 40; i++) {
+        for(int i = 0; i < 20; i++) {
             collectableNumbers.add(new NumberView(context, this.displayMetrics, rand.nextInt(10)));
         }
 
