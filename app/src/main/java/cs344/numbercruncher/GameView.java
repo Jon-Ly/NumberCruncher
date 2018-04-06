@@ -24,10 +24,10 @@ public class GameView extends View{
     private DisplayMetrics displayMetrics;
     private Random rand;
 
-    private ArrayList<NumberView> collectableNumbers;
+    private ArrayList<Number> collectableNumbers;
 
     private Paint paint;
-    private Rect player;
+    private Player player;
     private Paint playerPaint;
 
     private Handler h;
@@ -53,11 +53,13 @@ public class GameView extends View{
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         for(int i = 0; i < 20; i++) {
-            collectableNumbers.add(new NumberView(context, this.displayMetrics, rand.nextInt(10)));
+            int initLeft = rand.nextInt(displayMetrics.widthPixels - 50);
+            int initTop = -rand.nextInt((int)(displayMetrics.heightPixels * 1.5));
+            collectableNumbers.add(new Number(new Rect(initLeft, initTop, initLeft + 50, initTop + 50), rand.nextInt(10)));
         }
 
-        player = new Rect(displayMetrics.widthPixels/2 - 50, displayMetrics.heightPixels - 300,
-                            displayMetrics.widthPixels/2 + 50, displayMetrics.heightPixels - 200);
+        player = new Player(new Rect(displayMetrics.widthPixels/2 - 50, displayMetrics.heightPixels - 300,
+                            displayMetrics.widthPixels/2 + 50, displayMetrics.heightPixels - 200));
     }
 
     private Runnable r = new Runnable(){
@@ -70,23 +72,24 @@ public class GameView extends View{
     @Override
     protected void onDraw(Canvas canvas){
         canvas.drawColor(Color.BLUE);
+        canvas.drawRect(player.getBounds(), playerPaint);
 
-        canvas.drawRect(player, playerPaint);
-
-        for (NumberView num: collectableNumbers) {
-
-            Rect bound = num.getBound();
+        for (Number num: collectableNumbers) {
+            Rect number = num.getBound();
             paint.setAlpha(0);
-            canvas.drawRect(bound, paint);
-            bound.offsetTo(bound.left, bound.top + 10);
+            canvas.drawRect(number, paint);
+            number.offsetTo(number.left, number.top + 10);
             paint.setTextSize(50);
             paint.setColor(Color.GREEN);
-            canvas.drawText(num.getValue() + "", bound.left+bound.width()/4, bound.top+bound.height()/2+10, paint);
+            canvas.drawText(num.getValue() + "", number.left + number.width()/4, number.top + number.height()/2+10, paint);
 
-            if(bound.top > displayMetrics.heightPixels){
-                bound.offsetTo(displayMetrics.widthPixels - rand.nextInt(displayMetrics.widthPixels), - rand.nextInt(displayMetrics.heightPixels));
+            if(number.top > displayMetrics.heightPixels){ //reset numbers after it moves off the screen
+                number.offsetTo(displayMetrics.widthPixels - rand.nextInt(displayMetrics.widthPixels), - rand.nextInt(displayMetrics.heightPixels));
                 num.setValue(rand.nextInt(10));
             }
+
+            if(num.isPlayerCollision(player))
+                System.out.println("COLLIDE");
         }
 
         h.postDelayed(r, FRAME_RATE);
@@ -99,31 +102,24 @@ public class GameView extends View{
         switch(event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
                 isPlayerMove = this.isPlayerTapped(event);
-                System.out.println("Action Down: " + isPlayerMove);
                 handled = true;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                System.out.println("Action Pointer Down");
                 handled = true;
                 break;
             case MotionEvent.ACTION_MOVE:
-                System.out.println("Action Move");
-                System.out.println(isPlayerMove);
                 if(isPlayerMove)
-                    player.offsetTo((int)event.getX()-player.width()/2, player.top);
+                    player.getBounds().offsetTo((int)event.getX()-player.getBounds().width()/2, player.getBounds().top);
                 handled = true;
                 break;
             case MotionEvent.ACTION_UP:
                 isPlayerMove = false;
-                System.out.println("Action Up");
                 handled = true;
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-                System.out.println("Action Pointer Up");
                 handled = true;
                 break;
             case MotionEvent.ACTION_CANCEL:
-                System.out.println("Action Cancel");
                 handled = true;
                 break;
         }
@@ -132,8 +128,8 @@ public class GameView extends View{
     }
 
     public boolean isPlayerTapped(MotionEvent event){
-        if(event.getX() > player.left && event.getX() < player.right && event.getY() < player.bottom
-                && event.getY() > player.top) {
+        if(event.getX() > player.getBounds().left && event.getX() < player.getBounds().right && event.getY() < player.getBounds().bottom
+                && event.getY() > player.getBounds().top) {
             return true;
         }
         return false;
