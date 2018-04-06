@@ -20,9 +20,17 @@ public class MenuFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.menu_fragment, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
 
         Button playButton = (Button)getView().findViewById(R.id.play_button);
         Button challengeButton = (Button)getView().findViewById(R.id.challenge_button);
+        Button quitButton = (Button)getView().findViewById(R.id.quit_button);
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,23 +40,22 @@ public class MenuFragment extends Fragment{
             }
         });
 
-        challengeButton.setOnClickListener((new View.OnClickListener(){
+        challengeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent friendsIntent = new Intent(getActivity(), FriendListFragment.class);
-                startActivity(friendsIntent);
-
-
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                FriendListFragment friendFragment = new FriendListFragment();
-
-                ft.add(friendFragment, "").commit();
-
+                LoginFragment loginFrag = new LoginFragment();
+                ft.addToBackStack("");
+                ft.remove(getFragmentManager().getFragments().get(0));
+                ft.add(R.id.menu_placeholder, loginFrag).commit();
             }
-        }));
+        });
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.menu_fragment, container, false);
+        quitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.exit(0);
+            }
+        });
     }
-
 }

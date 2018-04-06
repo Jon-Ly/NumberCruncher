@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cs344.numbercruncher.FriendListFragment"
-    android:id="@+id/FriendFragment">
+    android:id="@+id/friendlist_fragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:id="@+id/textView6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Friend List"
+            android:text="Friends List"
             android:textSize="30sp" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

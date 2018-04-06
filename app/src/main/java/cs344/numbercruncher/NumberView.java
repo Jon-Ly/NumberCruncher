@@ -18,7 +18,6 @@ public class NumberView extends View{
     private int width;
     private int initLeft;
     private int initTop;
-    private final int OFFSET = 50;
 
     private Rect bound;
     private Random rand;
