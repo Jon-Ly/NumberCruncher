@@ -2,6 +2,8 @@ package cs344.numbercruncher;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,6 +13,8 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
+import android.view.animation.TranslateAnimation;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,13 +28,9 @@ public class GameView extends View{
     private DisplayMetrics displayMetrics;
     private Random rand;
 
-    private ArrayList<Number> collectableNumbers;
+    private ArrayList<CircleView> collectableCircleViews;
 
-    private Paint paint;
-    private Player player;
-    private Paint playerPaint;
-
-    private Handler h;
+    private Handler handler;
 
     private final int FRAME_RATE = 1;
 
@@ -39,27 +39,34 @@ public class GameView extends View{
     public GameView(Context context, AttributeSet attrs){
         super(context, attrs);
 
-        collectableNumbers = new ArrayList<>();
+        collectableCircleViews = new ArrayList<>();
 
         isPlayerMove = false;
 
-        paint = new Paint();
-        playerPaint = new Paint();
-        h = new Handler();
+        handler = new Handler();
 
         rand = new Random();
 
         displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        for(int i = 0; i < 20; i++) {
-            int initLeft = rand.nextInt(displayMetrics.widthPixels - 50);
-            int initTop = -rand.nextInt((int)(displayMetrics.heightPixels * 1.5));
-            collectableNumbers.add(new Number(new Rect(initLeft, initTop, initLeft + 50, initTop + 50), rand.nextInt(10)));
+        for(int i = 0; i < 10; i++) {
+            collectableCircleViews.add(new CircleView(this.getContext()));
+            collectableCircleViews.get(i).setY((displayMetrics.heightPixels * rand.nextFloat()));
+            collectableCircleViews.get(i).setX(displayMetrics.widthPixels * rand.nextFloat());
         }
 
-        player = new Player(new Rect(displayMetrics.widthPixels/2 - 50, displayMetrics.heightPixels - 300,
-                            displayMetrics.widthPixels/2 + 50, displayMetrics.heightPixels - 200));
+        System.out.println(collectableCircleViews);
+
+//        player = new Player(new Rect(displayMetrics.widthPixels/2 - 50, displayMetrics.heightPixels - 300,
+//                            displayMetrics.widthPixels/2 + 50, displayMetrics.heightPixels - 200));
+    }
+
+    @Override
+    public void onAttachedToWindow(){
+        super.onAttachedToWindow();
+        for(CircleView circ : collectableCircleViews)
+            ((RelativeLayout)getRootView().findViewById(R.id.game_area)).addView(circ);
     }
 
     private Runnable r = new Runnable(){
@@ -70,29 +77,17 @@ public class GameView extends View{
     };
 
     @Override
-    protected void onDraw(Canvas canvas){
-        canvas.drawColor(Color.BLUE);
-        canvas.drawRect(player.getBounds(), playerPaint);
+    public void onDraw(Canvas canvas){
+        for(CircleView circ : collectableCircleViews) {
+            circ.setY(circ.getY() + 10);
 
-        for (Number num: collectableNumbers) {
-            Rect number = num.getBound();
-            paint.setAlpha(0);
-            canvas.drawRect(number, paint);
-            number.offsetTo(number.left, number.top + 10);
-            paint.setTextSize(50);
-            paint.setColor(Color.GREEN);
-            canvas.drawText(num.getValue() + "", number.left + number.width()/4, number.top + number.height()/2+10, paint);
-
-            if(number.top > displayMetrics.heightPixels){ //reset numbers after it moves off the screen
-                number.offsetTo(displayMetrics.widthPixels - rand.nextInt(displayMetrics.widthPixels), - rand.nextInt(displayMetrics.heightPixels));
-                num.setValue(rand.nextInt(10));
+            if(circ.getY() > displayMetrics.heightPixels) {
+                circ.setY(-25);
+                circ.setX(displayMetrics.widthPixels * rand.nextFloat());
             }
-
-            if(num.isPlayerCollision(player))
-                System.out.println("COLLIDE");
         }
 
-        h.postDelayed(r, FRAME_RATE);
+        handler.postDelayed(r, FRAME_RATE);
     }
 
     @Override
@@ -109,7 +104,7 @@ public class GameView extends View{
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(isPlayerMove)
-                    player.getBounds().offsetTo((int)event.getX()-player.getBounds().width()/2, player.getBounds().top);
+//                    player.getBounds().offsetTo((int)event.getX()-player.getBounds().width()/2, player.getBounds().top);
                 handled = true;
                 break;
             case MotionEvent.ACTION_UP:
@@ -128,14 +123,10 @@ public class GameView extends View{
     }
 
     public boolean isPlayerTapped(MotionEvent event){
-        if(event.getX() > player.getBounds().left && event.getX() < player.getBounds().right && event.getY() < player.getBounds().bottom
-                && event.getY() > player.getBounds().top) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isNumberCollision(){
+//        if(event.getX() > player.getBounds().left && event.getX() < player.getBounds().right && event.getY() < player.getBounds().bottom
+//                && event.getY() > player.getBounds().top) {
+//            return true;
+//        }
         return false;
     }
 
