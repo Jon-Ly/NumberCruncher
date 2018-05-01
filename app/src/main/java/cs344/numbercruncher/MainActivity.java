@@ -4,11 +4,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.print(current);
             }
         }catch(Exception e){
+            e.printStackTrace();
             System.out.println("IT DIDN'T WORK");
         }finally{
             if (urlConnection != null) {

@@ -2,8 +2,6 @@ package cs344.numbercruncher;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,8 +11,9 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
-import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,48 +24,68 @@ import java.util.Random;
 
 public class GameView extends View{
 
-    private DisplayMetrics displayMetrics;
+    //counter & score
+    private TextView score_view;
+    private TextView counter_view;
+    private int counter_reset;
+
+    //display metrics
+    private DisplayMetrics display_metrics;
     private Random rand;
 
-    private ArrayList<CircleView> collectableCircleViews;
+    // circles
+    private ArrayList<CircleView> collectable_circle_views;
 
+    private ImageView player;
+
+    // thread
     private Handler handler;
-
     private final int FRAME_RATE = 1;
 
-    private boolean isPlayerMove;
+    private boolean is_player_move;
 
     public GameView(Context context, AttributeSet attrs){
         super(context, attrs);
 
-        collectableCircleViews = new ArrayList<>();
-
-        isPlayerMove = false;
+        counter_reset = 0;
 
         handler = new Handler();
-
         rand = new Random();
 
-        displayMetrics = new DisplayMetrics();
-        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        collectable_circle_views = new ArrayList<>();
 
-        for(int i = 0; i < 10; i++) {
-            collectableCircleViews.add(new CircleView(this.getContext()));
-            collectableCircleViews.get(i).setY((displayMetrics.heightPixels * rand.nextFloat()));
-            collectableCircleViews.get(i).setX(displayMetrics.widthPixels * rand.nextFloat());
+        is_player_move = false;
+
+        display_metrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(display_metrics);
+
+        for(int i = 0; i < 12; i++) {
+            collectable_circle_views.add(new CircleView(this.getContext()));
+            collectable_circle_views.get(i).setY((-display_metrics.heightPixels * rand.nextFloat()));
+            collectable_circle_views.get(i).setX(display_metrics.widthPixels * rand.nextFloat());
         }
 
-        System.out.println(collectableCircleViews);
-
-//        player = new Player(new Rect(displayMetrics.widthPixels/2 - 50, displayMetrics.heightPixels - 300,
-//                            displayMetrics.widthPixels/2 + 50, displayMetrics.heightPixels - 200));
+        player = new ImageView(this.getContext());
+        player.setImageResource(R.drawable.ic_player);
+        player.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        player.setAdjustViewBounds(true);
+        player.setY(display_metrics.heightPixels - 500);
+        player.setX(display_metrics.widthPixels/2);
     }
 
     @Override
-    public void onAttachedToWindow(){
+    public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        for(CircleView circ : collectableCircleViews)
-            ((RelativeLayout)getRootView().findViewById(R.id.game_area)).addView(circ);
+        for (CircleView circ : collectable_circle_views)
+            ((RelativeLayout) getRootView().findViewById(R.id.game_area)).addView(circ);
+
+        ((RelativeLayout) getRootView().findViewById(R.id.game_area)).addView(player);
+
+        score_view = getRootView().findViewById(R.id.score);
+        counter_view = getRootView().findViewById(R.id.counter);
+
+        score_view.setText("0");
+        counter_view.setText("30");
     }
 
     private Runnable r = new Runnable(){
@@ -78,13 +97,41 @@ public class GameView extends View{
 
     @Override
     public void onDraw(Canvas canvas){
-        for(CircleView circ : collectableCircleViews) {
-            circ.setY(circ.getY() + 10);
 
-            if(circ.getY() > displayMetrics.heightPixels) {
-                circ.setY(-25);
-                circ.setX(displayMetrics.widthPixels * rand.nextFloat());
+        Paint p = new Paint();
+        p.setColor(Color.BLUE);
+
+        for(CircleView circ : collectable_circle_views) {
+            circ.setY(circ.getY() + circ.getSpeed());
+
+            if(isPlayerCollision(circ)){
+                counter_view.setText((Integer.parseInt(counter_view.getText().toString()) + circ.getValue()) + "");
             }
+            if(Integer.parseInt(counter_view.getText().toString()) <= 0){
+                return;
+            }
+            if(circ.getY() > display_metrics.heightPixels || isPlayerCollision(circ)) {
+                circ.setY(-25);
+                circ.setX(display_metrics.widthPixels * rand.nextFloat());
+                circ.setRandomValue();
+            }
+            if(Integer.parseInt(score_view.getText().toString()) < 25){
+                circ.setSpeed((int)(display_metrics.heightPixels * 0.009));
+            }
+            if(score_view.getText().toString().equals("600")){ //phase 2
+                circ.setSpeed((int)(display_metrics.heightPixels * 0.012));
+            }
+            if(score_view.getText().toString().equals("1200")){ //phase 3
+                circ.setSpeed((int)(display_metrics.heightPixels * 0.015));
+            }
+        }
+
+        score_view.setText((Integer.parseInt(score_view.getText().toString()) + 1) + "");
+        counter_reset++;
+
+        if(counter_reset >= 30){
+            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+            counter_reset = 0;
         }
 
         handler.postDelayed(r, FRAME_RATE);
@@ -96,19 +143,19 @@ public class GameView extends View{
 
         switch(event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
-                isPlayerMove = this.isPlayerTapped(event);
+                is_player_move = this.isPlayerTapped(event);
                 handled = true;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 handled = true;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(isPlayerMove)
-//                    player.getBounds().offsetTo((int)event.getX()-player.getBounds().width()/2, player.getBounds().top);
+                if(is_player_move)
+                    player.setX((int)event.getX()-player.getWidth()/2);
                 handled = true;
                 break;
             case MotionEvent.ACTION_UP:
-                isPlayerMove = false;
+                is_player_move = false;
                 handled = true;
                 break;
             case MotionEvent.ACTION_POINTER_UP:
@@ -122,11 +169,19 @@ public class GameView extends View{
         return super.onTouchEvent(event) || handled;
     }
 
+    public boolean isPlayerCollision(CircleView circ){
+
+        Rect circ_temp_rect = new Rect((int)(circ.getX()), (int)(circ.getY()), (int)(circ.getX() + circ.getWidth()), (int)(circ.getY() + circ.getHeight()));
+        Rect player_rect = new Rect((int)(player.getX()), (int)(player.getY()), (int)(player.getX() + player.getWidth()), (int)(player.getY() + player.getHeight()));
+
+        return player_rect.intersect(circ_temp_rect);
+    }
+
     public boolean isPlayerTapped(MotionEvent event){
-//        if(event.getX() > player.getBounds().left && event.getX() < player.getBounds().right && event.getY() < player.getBounds().bottom
-//                && event.getY() > player.getBounds().top) {
-//            return true;
-//        }
+        if(event.getX() > player.getX() && event.getX() < player.getX() + player.getWidth() && event.getY() < player.getY() + player.getHeight()
+                && event.getY() > player.getY()) {
+            return true;
+        }
         return false;
     }
 

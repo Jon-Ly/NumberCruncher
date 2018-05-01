@@ -31,7 +31,7 @@
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/colorWhite"/>
+        android:textColor="@color/color_black"/>
 
     <TextView
         android:id="@+id/counter"
@@ -43,7 +43,7 @@
         android:textSize="16sp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/colorWhite" />
+        android:textColor="@color/color_black" />
 
     <RelativeLayout
         android:id="@+id/game_area"
