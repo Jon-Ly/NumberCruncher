@@ -4,10 +4,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,31 +22,28 @@ public class MainActivity extends AppCompatActivity {
         ft.add(R.id.menu_placeholder, new MenuFragment());
         ft.commit();
 
-        String user = "lyj47", pass = "hello";
-        HttpURLConnection urlConnection = null;
+        String user = "u", pass = "p";
 
-        try{
-            String link = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username="+user+"&password="+pass;
+        System.out.println("hello");
 
-            URL url = new URL(link);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream in = urlConnection.getInputStream();
+        String link = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=u&password=p&getUsers=1";
 
-            InputStreamReader isw = new InputStreamReader(in);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest string_request = new StringRequest(Request.Method.GET, link,
+                new Response.Listener<String>(){
 
-            int data = isw.read();
-            while (data != -1) {
-                char current = (char) data;
-                data = isw.read();
-                System.out.print(current);
+            public void onResponse(String response){
+                System.out.println(response);
             }
-        }catch(Exception e){
-            e.printStackTrace();
-            System.out.println("IT DIDN'T WORK");
-        }finally{
-            if (urlConnection != null) {
-                urlConnection.disconnect();
+
+        }, new Response.ErrorListener(){
+            public void onErrorResponse(VolleyError er){
+                er.printStackTrace();
             }
         }
+        );
+
+        queue.add(string_request);
+        System.out.println(string_request);
     }
 }

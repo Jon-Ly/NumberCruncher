@@ -55,7 +55,7 @@ public class CircleView extends AppCompatImageView {
         } else if (i < 0.79) {//red
             this.value = -3;
             this.setImageResource(R.drawable.ic_red_circle);
-        } else if (i < 0.90) {//black
+        } else if (i < 0.95) {//black
             this.value = -5;
             this.setImageResource(R.drawable.ic_black_circle);
         } else if (i < 1.00) {//purple

@@ -43,6 +43,7 @@ public class GameView extends View{
     private final int FRAME_RATE = 1;
 
     private boolean is_player_move;
+    private boolean is_game_over;
 
     public GameView(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -55,6 +56,7 @@ public class GameView extends View{
         collectable_circle_views = new ArrayList<>();
 
         is_player_move = false;
+        is_game_over = false;
 
         display_metrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(display_metrics);
@@ -69,7 +71,7 @@ public class GameView extends View{
         player.setImageResource(R.drawable.ic_player);
         player.setScaleType(ImageView.ScaleType.FIT_CENTER);
         player.setAdjustViewBounds(true);
-        player.setY(display_metrics.heightPixels - 500);
+        player.setY((int)(display_metrics.heightPixels * 0.7));
         player.setX(display_metrics.widthPixels/2);
     }
 
@@ -108,6 +110,7 @@ public class GameView extends View{
                 counter_view.setText((Integer.parseInt(counter_view.getText().toString()) + circ.getValue()) + "");
             }
             if(Integer.parseInt(counter_view.getText().toString()) <= 0){
+                is_game_over = true;
                 return;
             }
             if(circ.getY() > display_metrics.heightPixels || isPlayerCollision(circ)) {
@@ -129,7 +132,7 @@ public class GameView extends View{
         score_view.setText((Integer.parseInt(score_view.getText().toString()) + 1) + "");
         counter_reset++;
 
-        if(counter_reset >= 30){
+        if(counter_reset >= 25){
             counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
             counter_reset = 0;
         }
@@ -143,7 +146,7 @@ public class GameView extends View{
 
         switch(event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
-                is_player_move = this.isPlayerTapped(event);
+                is_player_move = this.isPlayerTapped(event) && !is_game_over;
                 handled = true;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
