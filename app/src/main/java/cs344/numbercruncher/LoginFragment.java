@@ -1,6 +1,8 @@
 package cs344.numbercruncher;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -39,19 +41,19 @@ public class LoginFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final Button loginButton = (Button) getActivity().findViewById(R.id.login_button);
-        final CheckBox registerCheckbox = (CheckBox) getActivity().findViewById(R.id.register_checkbox);
+        final Button login_button = (Button) getActivity().findViewById(R.id.login_button);
+        final CheckBox register_checkbox = (CheckBox) getActivity().findViewById(R.id.register_checkbox);
 
-        registerCheckbox.setOnClickListener(new View.OnClickListener() {
+        register_checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginButton.setText(registerCheckbox.isChecked() ? "Register" : "Login");
+                login_button.setText(register_checkbox.isChecked() ? "Register" : "Login");
             }
         });
 
-        db = new Database(getContext(), getActivity());
+        db = new Database(getContext());
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText username_field = (EditText) getActivity().findViewById(R.id.username_field);
@@ -60,7 +62,7 @@ public class LoginFragment extends Fragment {
                 String username = username_field.getText().toString();
                 String password = password_field.getText().toString();
 
-                if (registerCheckbox.isChecked()) {
+                if (register_checkbox.isChecked()) {
                     if (username.length() < 4) {
                         // 4 character long check
                         Toast.makeText(getContext(), "Username must be at least 4 characters long", Toast.LENGTH_SHORT).show();
@@ -73,13 +75,17 @@ public class LoginFragment extends Fragment {
                     }
                 } else {
                     //Login
+                    if(db.Login(username, password)){
+                        SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = shared_pref.edit();
 
+                        System.out.println("successful");
 
-                    db.Login(username, password);
-
-//                        Intent gameIntent = new Intent(LoginActivity.this, MainActivity.class);
-//                        gameIntent.putExtra("USERNAME", username);
-//                        startActivity(gameIntent);
+                        editor.putString("USERNAME", username);
+                        editor.commit();
+                    }else{
+                        Toast.makeText(getContext(), "Login information is incorrect", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 

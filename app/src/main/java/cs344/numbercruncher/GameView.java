@@ -24,6 +24,10 @@ import java.util.Random;
 
 public class GameView extends View{
 
+    private final int PHASE_1_SCORE = 750;
+    private final int PHASE_2_SCORE = 1500;
+    private final int PHASE_3_SCORE = 2250;
+
     //counter & score
     private TextView score_view;
     private TextView counter_view;
@@ -99,10 +103,6 @@ public class GameView extends View{
 
     @Override
     public void onDraw(Canvas canvas){
-
-        Paint p = new Paint();
-        p.setColor(Color.BLUE);
-
         for(CircleView circ : collectable_circle_views) {
             circ.setY(circ.getY() + circ.getSpeed());
 
@@ -121,10 +121,10 @@ public class GameView extends View{
             if(Integer.parseInt(score_view.getText().toString()) < 25){
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.009));
             }
-            if(score_view.getText().toString().equals("600")){ //phase 2
+            if(Integer.parseInt(score_view.getText().toString()) == PHASE_1_SCORE){ //phase 1
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.012));
             }
-            if(score_view.getText().toString().equals("1200")){ //phase 3
+            if(Integer.parseInt(score_view.getText().toString()) == PHASE_2_SCORE){ //phase 2
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.015));
             }
         }
@@ -132,7 +132,17 @@ public class GameView extends View{
         score_view.setText((Integer.parseInt(score_view.getText().toString()) + 1) + "");
         counter_reset++;
 
-        if(counter_reset >= 25){
+        if(counter_reset >= 25 && Integer.parseInt(score_view.getText().toString()) < PHASE_1_SCORE){
+            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+            counter_reset = 0;
+        }else if(counter_reset >= 20 && Integer.parseInt(score_view.getText().toString()) > PHASE_1_SCORE
+                  && Integer.parseInt(score_view.getText().toString()) < PHASE_2_SCORE){
+            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+            counter_reset = 0;
+        }else if(counter_reset >= 15 && Integer.parseInt(score_view.getText().toString()) > PHASE_2_SCORE){
+            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+            counter_reset = 0;
+        }else if(counter_reset >= 12 && Integer.parseInt(score_view.getText().toString()) > PHASE_3_SCORE){
             counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
             counter_reset = 0;
         }

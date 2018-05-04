@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -17,6 +18,8 @@ import android.widget.Toast;
  */
 
 public class MenuFragment extends Fragment {
+
+    private TextView greeting_text_view;
 
     public MenuFragment() {
     }
@@ -32,7 +35,14 @@ public class MenuFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        greeting_text_view = getActivity().findViewById(R.id.greeting_text_view);
+
         final SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if(!shared_pref.getString("USERNAME", "").equals(""))
+            greeting_text_view.setText("Welcome " + shared_pref.getString("USERNAME", ""));
+        else
+            greeting_text_view.setText("Login to Challenge!");
 
         Button playButton = (Button) getView().findViewById(R.id.play_button);
         final Button challengeButton = (Button) getView().findViewById(R.id.challenge_button);
@@ -51,14 +61,16 @@ public class MenuFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                boolean is_logged_in = shared_pref.getBoolean("LOGGED_IN", false);
+                String logged_in_username = shared_pref.getString("USERNAME", "");
 
-                if (is_logged_in) {
+                System.out.println("CURRENT USER: " + logged_in_username);
+
+                if (!logged_in_username.equals("")) {
                     FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                    LoginFragment loginFrag = new LoginFragment();
+                    FriendListFragment friend_list_fragment = new FriendListFragment();
                     ft.addToBackStack("");
                     ft.remove(getFragmentManager().getFragments().get(0));
-                    ft.add(R.id.menu_placeholder, loginFrag).commit();
+                    ft.add(R.id.menu_placeholder, friend_list_fragment).commit();
                 } else {
                     Toast.makeText(getContext(), "You must register or login to challenge.", Toast.LENGTH_SHORT).show();
                 }

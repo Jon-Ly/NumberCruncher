@@ -1,9 +1,6 @@
 package cs344.numbercruncher;
 
-
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -22,27 +19,22 @@ import java.util.ArrayList;
 public class Database {
 
     private Context context;
-    private Activity activity;
     private String url;
     private RequestQueue queue;
 
-    private String successful_login;
+    private boolean successful_login;
+    private boolean successful_registration;
 
     public Database(Context context) {
         this.context = context;
         this.url = "";
     }
 
-    public Database(Context context, Activity activity){
-        this.context = context;
-        this.activity = activity;
-    }
-
     public void RecordGame(int user_id, int friend_id, int user_score, int friend_score) {
         if (friend_id == -1) {
             url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?userId=" + user_id +
                     "&friendId=" + friend_id + "&userScore=" + user_score + "&friendScore=" + friend_score;
-        }else{
+        } else {
             url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?userId=" + user_id
                     + "&userScore=" + user_score;
         }
@@ -64,22 +56,23 @@ public class Database {
         queue.add(string_request);
     }
 
-    public void RegisterUser(String username, String password){
+    public boolean RegisterUser(String username, String password) {
 
         url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username
-                    + "&password=" + password + "&register=1";
+                + "&password=" + password + "&register=1";
 
         this.queue = Volley.newRequestQueue(this.context);
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
 
                     public void onResponse(String response) {
-                        if(response.equals("duplicate")){
+                        if (response.equals("duplicate")) {
                             Toast.makeText(context, "That username has been taken already.",
-                                            Toast.LENGTH_SHORT).show();
-                        }else {
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
                             Toast.makeText(context, "You've been registered! Please login.",
                                     Toast.LENGTH_SHORT).show();
+                            successful_registration = true;
                         }
                     }
 
@@ -90,9 +83,11 @@ public class Database {
         }
         );
         queue.add(string_request);
+
+        return successful_registration;
     }
 
-    public ArrayList<Friend> GetFriends(String username){
+    public ArrayList<Friend> GetFriends(String username) {
 
         url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username + "&friends=1";
 
@@ -101,7 +96,7 @@ public class Database {
                 new Response.Listener<String>() {
 
                     public void onResponse(String response) {
-
+                        System.out.println(response);
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError er) {
@@ -114,21 +109,16 @@ public class Database {
         return new ArrayList<>();
     }
 
-    public boolean Login(String username, String password){
+    public boolean Login(String username, String password) {
 
         url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username
-                    + "&password=" + password + "&check=1";
-
-        boolean successful = false;
+                + "&password=" + password + "&check=1";
 
         this.queue = Volley.newRequestQueue(this.context);
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     public void onResponse(String response) {
-                        System.out.println(response);
-                        SharedPreferences shared_pref = activity.getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = shared_pref.edit();
-                        editor.putString("USERNAME ", response);
+                        successful_login = true;
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError er) {
@@ -138,14 +128,12 @@ public class Database {
         );
         queue.add(string_request);
 
-        return successful;
+        return successful_login;
     }
 
-    public void AcceptFriendRequest(int user_id, int friend_id){
+    public void AcceptFriendRequest(int user_id, int friend_id) {
         url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?userId=" + user_id
                 + "&friendId=" + friend_id + "&check=1";
-
-        boolean successful = false;
 
         this.queue = Volley.newRequestQueue(this.context);
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
