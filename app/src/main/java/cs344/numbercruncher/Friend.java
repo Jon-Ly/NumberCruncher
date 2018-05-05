@@ -10,10 +10,10 @@ public class Friend {
     private int losses;
     private int wins;
 
-    public Friend(){
-        this.username = "";
-        this.losses = 0;
-        this.wins = 0;
+    public Friend(String username, int losses, int wins){
+        this.username = username;
+        this.losses = losses;
+        this.wins = wins;
     }
 
     public String getUsername(){

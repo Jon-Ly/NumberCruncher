@@ -27,8 +27,7 @@ public class LoginFragment extends Fragment {
 
     private Database db;
 
-    public LoginFragment() {
-    }
+    public LoginFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,11 +74,17 @@ public class LoginFragment extends Fragment {
                     }
                 } else {
                     //Login
-                    if(db.Login(username, password)){
+                    boolean logged_in = db.Login(username, password);
+
+                    if(logged_in){
                         SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = shared_pref.edit();
 
-                        System.out.println("successful");
+                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        MenuFragment menu_frag = new MenuFragment();
+                        ft.addToBackStack("");
+                        ft.remove(getFragmentManager().getFragments().get(0));
+                        ft.add(R.id.menu_placeholder, menu_frag).commit();
 
                         editor.putString("USERNAME", username);
                         editor.commit();

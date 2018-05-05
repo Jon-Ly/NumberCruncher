@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +33,11 @@ public class MenuFragment extends Fragment {
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -39,15 +45,17 @@ public class MenuFragment extends Fragment {
 
         final SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        if(!shared_pref.getString("USERNAME", "").equals(""))
-            greeting_text_view.setText("Welcome " + shared_pref.getString("USERNAME", ""));
-        else
-            greeting_text_view.setText("Login to Challenge!");
-
         Button playButton = (Button) getView().findViewById(R.id.play_button);
         final Button challengeButton = (Button) getView().findViewById(R.id.challenge_button);
         Button quitButton = (Button) getView().findViewById(R.id.quit_button);
-        Button login_button = (Button) getView().findViewById(R.id.login_button);
+        final Button login_button = (Button) getView().findViewById(R.id.login_button);
+
+        if(!shared_pref.getString("USERNAME", "").equals("")) {
+            greeting_text_view.setText("Welcome " + shared_pref.getString("USERNAME", ""));
+            login_button.setText("Logout");
+        } else {
+            greeting_text_view.setText("Login to Challenge!");
+        }
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,11 +95,17 @@ public class MenuFragment extends Fragment {
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                LoginFragment loginFrag = new LoginFragment();
-                ft.addToBackStack("");
-                ft.remove(getFragmentManager().getFragments().get(0));
-                ft.add(R.id.menu_placeholder, loginFrag).commit();
+                if(login_button.getText().toString().toLowerCase().equals("logout")){
+                    shared_pref.edit().clear().commit();
+                    greeting_text_view.setText("Login to Challenge!");
+                    login_button.setText("Login");
+                }else {
+                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                    LoginFragment login_frag = new LoginFragment();
+                    ft.addToBackStack("");
+                    ft.remove(getFragmentManager().getFragments().get(0));
+                    ft.add(R.id.menu_placeholder, login_frag).commit();
+                }
             }
         });
     }

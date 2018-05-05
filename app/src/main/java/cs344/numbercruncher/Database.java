@@ -91,12 +91,32 @@ public class Database {
 
         url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username + "&friends=1";
 
+        final ArrayList<Friend> friends = new ArrayList<>();
+
         this.queue = Volley.newRequestQueue(this.context);
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
-
                     public void onResponse(String response) {
-                        System.out.println(response);
+                        String clean_response = "";
+
+                        for(int i = 0; i < response.length(); i++){
+                            if(response.charAt(i) != '[' || response.charAt(i) != ']' ||
+                                    response.charAt(i) != '"'){
+                                clean_response += response.charAt(i);
+                                System.out.println(clean_response);
+                            }
+                        }
+
+                        String[] parts = clean_response.split(",");
+
+                        System.out.println(clean_response);
+
+                        for(int i = 0; i < parts.length/3; i++) {
+                            friends.add(new Friend(parts[i], Integer.parseInt(parts[i + 1]),
+                                    Integer.parseInt(parts[i + 2])));
+
+                            System.out.println(friends.get(i).getUsername() + " | " + friends.get(i).getWins() + " | " + friends.get(i).getLosses());
+                        }
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError er) {
@@ -106,7 +126,7 @@ public class Database {
         );
         queue.add(string_request);
 
-        return new ArrayList<>();
+        return friends;
     }
 
     public boolean Login(String username, String password) {
@@ -118,11 +138,13 @@ public class Database {
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     public void onResponse(String response) {
+                        System.out.println(response);
                         successful_login = true;
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError er) {
-                Toast.makeText(context, "Could not display friends.", Toast.LENGTH_SHORT).show();
+                er.printStackTrace();
+                Toast.makeText(context, "Could not login.", Toast.LENGTH_SHORT).show();
             }
         }
         );
