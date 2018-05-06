@@ -35,6 +35,16 @@ public class MenuFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
+
+        SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        Button login_button = (Button) getView().findViewById(R.id.login_button);
+
+//        if(!shared_pref.getString("USERNAME", "").equals("")) {
+//            greeting_text_view.setText("Welcome " + shared_pref.getString("USERNAME", ""));
+//            login_button.setText("Logout");
+//        } else {
+//            greeting_text_view.setText("Login to Challenge!");
+//        }
     }
 
     @Override
@@ -70,8 +80,6 @@ public class MenuFragment extends Fragment {
             public void onClick(View v) {
 
                 String logged_in_username = shared_pref.getString("USERNAME", "");
-
-                System.out.println("CURRENT USER: " + logged_in_username);
 
                 if (!logged_in_username.equals("")) {
                     FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();

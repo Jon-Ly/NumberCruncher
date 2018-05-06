@@ -1,14 +1,10 @@
 package cs344.numbercruncher;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +12,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.util.regex.Pattern;
 
@@ -26,8 +29,12 @@ import java.util.regex.Pattern;
 public class LoginFragment extends Fragment {
 
     private Database db;
+    private String url;
+    private RequestQueue queue;
+    private boolean is_successful;
 
-    public LoginFragment() { }
+    public LoginFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,14 +59,16 @@ public class LoginFragment extends Fragment {
 
         db = new Database(getContext());
 
+        is_successful = false;
+
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText username_field = (EditText) getActivity().findViewById(R.id.username_field);
                 EditText password_field = (EditText) getActivity().findViewById(R.id.password_field);
 
-                String username = username_field.getText().toString();
-                String password = password_field.getText().toString();
+                final String username = username_field.getText().toString();
+                final String password = password_field.getText().toString();
 
                 if (register_checkbox.isChecked()) {
                     if (username.length() < 4) {
@@ -70,30 +79,76 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getContext(), "Password must contain 1 uppercase, 1 lowercase, and 1 number", Toast.LENGTH_LONG).show();
                     } else {
                         //successful register
-                        db.RegisterUser(username, password);
+                        url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username
+                                + "&password=" + password + "&register=1";
+
+                        queue = Volley.newRequestQueue(getContext());
+                        StringRequest string_request = new StringRequest(Request.Method.GET, url,
+                                new Response.Listener<String>() {
+
+                                    public void onResponse(String response) {
+                                        if (response.equals("duplicate")) {
+                                            Toast.makeText(getContext(), "That username has been taken already.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getContext(), "You've been registered! Please login.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                }, new Response.ErrorListener() {
+                            public void onErrorResponse(VolleyError er) {
+                                Toast.makeText(getContext(), "Could not register, an error occurred", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        );
+                        queue.add(string_request);
                     }
                 } else {
                     //Login
-                    boolean logged_in = db.Login(username, password);
+//                    if (db.Login(username, password) || db.Login(username, password)) {
+//                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                        MenuFragment menu_fragment = new MenuFragment();
+//                        ft.addToBackStack("");
+//                        ft.remove(getFragmentManager().getFragments().get(0));
+//                        ft.add(R.id.menu_placeholder, menu_fragment).commit();
+//                    }
 
-                    if(logged_in){
-                        SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = shared_pref.edit();
+                    url = "http://webdev.cs.uwosh.edu/students/lyj47/procedures.php?username=" + username
+                            + "&password=" + password + "&check=1";
 
-                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                        MenuFragment menu_frag = new MenuFragment();
-                        ft.addToBackStack("");
-                        ft.remove(getFragmentManager().getFragments().get(0));
-                        ft.add(R.id.menu_placeholder, menu_frag).commit();
+                    queue = Volley.newRequestQueue(getContext());
+                    StringRequest string_request = new StringRequest(Request.Method.GET, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    if(!response.contains("unsuccessful")) {
+                                        SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-                        editor.putString("USERNAME", username);
-                        editor.commit();
-                    }else{
-                        Toast.makeText(getContext(), "Login information is incorrect", Toast.LENGTH_SHORT).show();
+                                        SharedPreferences.Editor editor = shared_pref.edit();
+
+                                        editor.putString("USERNAME", response).commit();
+
+                                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                        MenuFragment menu_frag = new MenuFragment();
+                                        ft.addToBackStack("");
+                                        ft.remove(getFragmentManager().getFragments().get(0));
+                                        ft.add(R.id.menu_placeholder, menu_frag).commit();
+                                    }else{
+                                        Toast.makeText(getContext(), "Your information is incorrect.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        public void onErrorResponse(VolleyError er) {
+                            er.printStackTrace();
+                            Toast.makeText(getContext(), "Could not login.", Toast.LENGTH_SHORT).show();
+                        }
                     }
+                    );
+                    queue.add(string_request);
+
                 }
             }
-
         });
     }
 }
