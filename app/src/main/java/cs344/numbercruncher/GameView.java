@@ -2,9 +2,8 @@ package cs344.numbercruncher;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -91,7 +90,7 @@ public class GameView extends View{
         counter_view = getRootView().findViewById(R.id.counter);
 
         score_view.setText("0");
-        counter_view.setText("30");
+        counter_view.setText("5");
     }
 
     private Runnable r = new Runnable(){
@@ -103,14 +102,22 @@ public class GameView extends View{
 
     @Override
     public void onDraw(Canvas canvas){
+
+        int score = Integer.parseInt(score_view.getText().toString());
+        int counter = Integer.parseInt(counter_view.getText().toString());
+
         for(CircleView circ : collectable_circle_views) {
             circ.setY(circ.getY() + circ.getSpeed());
 
             if(isPlayerCollision(circ)){
-                counter_view.setText((Integer.parseInt(counter_view.getText().toString()) + circ.getValue()) + "");
+                counter_view.setText((counter + circ.getValue()) + "");
             }
             if(Integer.parseInt(counter_view.getText().toString()) <= 0){
                 is_game_over = true;
+                counter_view.setText("0");
+
+                GameOverDialog gameover_dialog = new GameOverDialog((Activity) getContext(), score, ((Activity) getContext()).getIntent().getStringExtra("USERNAME"));
+                gameover_dialog.show();
                 return;
             }
             if(circ.getY() > display_metrics.heightPixels || isPlayerCollision(circ)) {
@@ -118,32 +125,32 @@ public class GameView extends View{
                 circ.setX(display_metrics.widthPixels * rand.nextFloat());
                 circ.setRandomValue();
             }
-            if(Integer.parseInt(score_view.getText().toString()) < 25){
+            if(score < 25){
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.009));
             }
-            if(Integer.parseInt(score_view.getText().toString()) == PHASE_1_SCORE){ //phase 1
+            if(score == PHASE_1_SCORE){ //phase 1
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.012));
             }
-            if(Integer.parseInt(score_view.getText().toString()) == PHASE_2_SCORE){ //phase 2
+            if(score == PHASE_2_SCORE){ //phase 2
                 circ.setSpeed((int)(display_metrics.heightPixels * 0.015));
             }
         }
 
-        score_view.setText((Integer.parseInt(score_view.getText().toString()) + 1) + "");
+        score_view.setText((score + 1) + "");
         counter_reset++;
 
-        if(counter_reset >= 25 && Integer.parseInt(score_view.getText().toString()) < PHASE_1_SCORE){
-            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+        if(counter_reset >= 25 && score < PHASE_1_SCORE){
+            counter_view.setText((counter - 1) + "");
             counter_reset = 0;
-        }else if(counter_reset >= 20 && Integer.parseInt(score_view.getText().toString()) > PHASE_1_SCORE
-                  && Integer.parseInt(score_view.getText().toString()) < PHASE_2_SCORE){
-            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+        }else if(counter_reset >= 20 && score > PHASE_1_SCORE
+                  && score < PHASE_2_SCORE){
+            counter_view.setText((counter - 1) + "");
             counter_reset = 0;
-        }else if(counter_reset >= 15 && Integer.parseInt(score_view.getText().toString()) > PHASE_2_SCORE){
-            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+        }else if(counter_reset >= 15 && score > PHASE_2_SCORE){
+            counter_view.setText((counter - 1) + "");
             counter_reset = 0;
-        }else if(counter_reset >= 12 && Integer.parseInt(score_view.getText().toString()) > PHASE_3_SCORE){
-            counter_view.setText((Integer.parseInt(counter_view.getText().toString()) - 1) + "");
+        }else if(counter_reset >= 12 && score > PHASE_3_SCORE){
+            counter_view.setText((counter - 1) + "");
             counter_reset = 0;
         }
 

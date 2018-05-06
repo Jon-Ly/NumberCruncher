@@ -1,38 +1,19 @@
 package cs344.numbercruncher;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v7.widget.AppCompatImageView;
 
 /**
  * Created by wintow on 4/6/2018.
  */
 
-public class Player implements GameObject {
+public class Player extends AppCompatImageView {
 
-    private Rect player;
-
-    public Player(Rect rect){
-        super();
-        this.player = rect;
+    public Player(Context context) {
+        super(context);
     }
-
-    @Override
-    public void draw(Canvas canvas){
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-
-        canvas.drawRect(player, paint);
-    }
-
-    @Override
-    public void update(){
-
-    }
-
-    public Rect getBounds(){
-        return this.player;
-    }
-
 }

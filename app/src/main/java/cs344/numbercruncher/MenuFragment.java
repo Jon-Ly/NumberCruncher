@@ -33,21 +33,6 @@ public class MenuFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-
-        SharedPreferences shared_pref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        Button login_button = (Button) getView().findViewById(R.id.login_button);
-
-//        if(!shared_pref.getString("USERNAME", "").equals("")) {
-//            greeting_text_view.setText("Welcome " + shared_pref.getString("USERNAME", ""));
-//            login_button.setText("Logout");
-//        } else {
-//            greeting_text_view.setText("Login to Challenge!");
-//        }
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -71,6 +56,7 @@ public class MenuFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent gameIntent = new Intent(getActivity(), GameActivity.class);
+                gameIntent.putExtra("USERNAME", shared_pref.getString("USERNAME", ""));
                 startActivity(gameIntent);
             }
         });
