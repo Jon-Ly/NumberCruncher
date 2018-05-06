@@ -41,7 +41,6 @@ public class Database {
                 new Response.Listener<String>() {
 
                     public void onResponse(String response) {
-                        System.out.println("INSERTED THE GAME " + response);
                     }
 
                 }, new Response.ErrorListener() {
@@ -61,7 +60,6 @@ public class Database {
         StringRequest string_request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     public void onResponse(String response) {
-                        System.out.println(response);
                     }
                 }, new Response.ErrorListener() {
             public void onErrorResponse(VolleyError er) {
